@@ -2,6 +2,10 @@
 
 Accessing AI has never been easier than it is today - this site is here to help you get started, both for the novice and the eager coder. This is, however, mainly an introduction and a way to get started - there's plenty of resources available if you have already started using AI.
 
+# QR code to get here
+
+![QR code!](/gettingstarted.png "QR code to get to this page")
+
 # Easiest to use - online general AI
 
 ## [ChatGPT](https://chatgpt.com/) 
