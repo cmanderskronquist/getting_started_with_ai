@@ -61,3 +61,19 @@ NOTE: Entirely free. Can result in NSFW images.
 For the refined developer who's willing to invest time and effort. 
 
 This section is under development.
+
+# General guidelines when using AI
+
+Current generation AI is, effectively just large language models who associate certain input with certain outputs. This means that while the output can look reasonable, and even look well-reasoned (if a text), it is in fact just text from a program *that does not itself know what it is writing*. 
+
+You, as the user of an AI, have to check its output. This can cause problems if setting up AI programmatic responses, such as chatbots or knowledge agents, which are used by people without knowledge of how AI works and its limitations.
+
+In short, trust but verify. Most available AI is not designed to lie to you, but they are often made to answer questions even if the questions are in areas in which the AI lacks good data - very few models of AI are designed to outright stop their processing when they reach areas that are beyond their scope and training data. This leads to what is called "AI hallucinations" but the important point is that for the AI there is no real difference between a good answer and a hallucination.
+
+# IP / immaterial rights / lawyer
+
+Using AI in your day to day business can lead to the business being liable for actions taken by the AI.
+
+A useful site to check out in regards to AI governance is [anch.ai](https://anch.ai/).
+
+[IBM has an AI offering](https://www.ibm.com/watsonx), which can provide some limited liability when used out of the box.
