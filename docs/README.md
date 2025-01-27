@@ -4,7 +4,7 @@ Accessing AI has never been easier than it is today - this site is here to help 
 
 # QR code to get here
 
-![QR code!](gettingstarted.png "QR code to get to this page")
+![QR code!](gettingstarted_github.png "QR code to get to this page")
 
 # Easiest to use - online general AI
 
