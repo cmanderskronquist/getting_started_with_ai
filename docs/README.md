@@ -64,7 +64,7 @@ This section is under development.
 
 # General guidelines when using AI
 
-Current generation AI is, effectively just large language models who associate certain input with certain outputs. This means that while the output can look reasonable, and even look well-reasoned (if a text), it is in fact just text from a program *that does not itself know what it is writing*. 
+Current generation AI is just large language models who takes in input and generate output. This means that while the output can look reasonable, and even look well-reasoned (if a text), it is in fact just text from a program *that does not itself know what it is writing*. 
 
 You, as the user of an AI, have to check its output. This can cause problems if setting up AI programmatic responses, such as chatbots or knowledge agents, which are used by people without knowledge of how AI works and its limitations.
 
