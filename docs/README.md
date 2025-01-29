@@ -74,11 +74,14 @@ Set up the python virtual environment:
 `python -m venv env`
 
 Depending on whether you are on Windows or Unix, use the proper command from below:
+
 `.\env\Scripts\activate`
 or
+
 `source ./env/bin/activate`
 
 Run the following to get the packages needed in the virtual environment:
+
 `pip install transformers sumy torch torchvision torchaudio`
 
 And finally run the summarizer on the supplied text file:
