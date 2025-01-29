@@ -62,16 +62,24 @@ For the refined developer who's willing to invest time and effort.
 
 This section is under development, but a starting point is to install Python 3.12 (not 3.13).
 
-Run the following to get the packages needed:
-`pip install transformers sumy torch torchvision torchaudio`
-
-Then grab the git repository by cloning it like this:
+Grab this git repository by cloning it like this:
 
 `git clone https://github.com/cmanderskronquist/getting_started_with_ai.git`
 
 Then swap to the text summarizer demo directory:
 
 `cd getting_started_with_ai/python_text_summarizer`
+
+Set up the python virtual environment:
+`python -m venv env`
+
+Depending on whether you are on Windows or Unix, use the proper command from below:
+`.\env\Scripts\activate`
+or
+`source ./env/bin/activate`
+
+Run the following to get the packages needed in the virtual environment:
+`pip install transformers sumy torch torchvision torchaudio`
 
 And finally run the summarizer on the supplied text file:
 
