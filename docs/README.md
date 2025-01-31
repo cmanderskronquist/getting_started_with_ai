@@ -4,7 +4,7 @@ Accessing AI has never been easier than it is today - this site is here to help 
 
 # QR code to get here
 
-![QR code!](gettingstarted_qrcode_small.png "QR code to get to this page")
+<img src="gettingstarted_qrcode_small.png" alt="QR code to get to this page" title="QR code to get to this page" width="30%" height="30%" />
 
 # Easiest to use - online general AI
 
