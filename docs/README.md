@@ -88,6 +88,28 @@ And finally run the summarizer on the supplied text file:
 
 `python transformer_summarize.py king_in_yellow_chapter_1.txt`
 
+# Using AI to aid with coding in your IDE
+
+You are probably best served by using each IDE makers own AI plugin (IntelliJ AI Assistant, GitHub CoPilot for Visual Studio + Code, etc).
+
+Most AI plugins simply work as an easy access to the prompt for the AI models/services that they provide, and don't provide full code base analysis.
+
+
+## IntelliJ
+
+Magical AI worked pretty well with ollama run locally. I had to enter a fake license key and use the default custom URL to use the ollama on localhost.
+
+The ```deepseek-r1:8b``` model worked quite well, large context and good reasoning module.
+
+AI assistant, JetBrains own AI plugin, is much better integrated with the IDE (surprise, surprise) but requires activation and only has a 7 day free trial.
+
+## Visual Studio Code
+
+Tabnine has a free offering: https://www.tabnine.com/
+
+Still, as for IntelliJ, your best bet is likely the extension made by the same people that made the IDE - in this case GitHub CoPilot.
+
+
 # General guidelines when using AI
 
 Current generation AI is just large language models who takes in input and generate output. This means that while the output can look reasonable, and even look well-reasoned (if a text), it is in fact just text from a program *that does not itself know what it is writing*. 
