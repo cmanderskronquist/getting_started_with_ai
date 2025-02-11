@@ -1,0 +1,4 @@
+python_text_summarizer/env/**
+.history
+chatbot_from_documents/venv/**
+hf_token
