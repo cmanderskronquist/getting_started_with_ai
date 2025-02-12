@@ -40,6 +40,12 @@ Another AI that is intended to help with software development, and is more of an
 
 NOTE: *Requires* registration, but not payment - free account is time limited.
 
+# Online Virtual Machine AI
+
+## [Colab](https://colab.research.google.com/)
+Google colab let's you access a free (with limitations) environment with python and/or R. You can do pretty much anything a local python environment can do. It is also easy to try stuff and then export to a different environment. Privacy not included. Terms and conditions apply.
+
+
 # Local AI
 
 ## [LM Studio](https://lmstudio.ai/)
