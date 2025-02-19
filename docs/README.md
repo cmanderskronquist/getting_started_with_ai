@@ -24,6 +24,13 @@ New challenger to ChatGPT from a Chinese firm. Astoundingly powerful in spite of
 
 NOTE: *Requires* registration, but not payment.
 
+## [Suno](https://suno.com/)
+
+Suno is a website that allows you to generate music - and lyrics. 
+
+NOTE: Free with registration up to 10 songs per day.
+
+
 # Online specialized AI
 
 ## [Claude](https://claude.ai/)
