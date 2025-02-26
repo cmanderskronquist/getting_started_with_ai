@@ -12,8 +12,9 @@ import time
 # Set up env (Powershell): .\venv\Scripts activate
 # install the packages:
 # pip install --upgrade pip  # Uppdatera pip först
-# pip install requests beautifulsoup4 sentence-transformers faiss-cpu numpy
-
+# pip install requests beautifulsoup4 sentence-transformers faiss-cpu numpy protobuf
+# You might need the following in case your computer is slow like mine is (but python will tell you about it)
+# pip install 'accelerate>=0.26.0'
 # Read Hugging Face token from file hf_token
 with open("hf_token", "r") as token_file:
     HF_TOKEN = token_file.read().strip()
@@ -62,6 +63,7 @@ def retrieve_relevant_text(question: str):
     answers = [sentences[i] for i in I[0] if i < len(sentences)]
     return "\n".join(answers)
 
+# Note: If you create your own token, you might need to go to HuggingFace and agree to this particular repositorys usage policy on the site on that user.
 tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-Instruct-v0.1", token=HF_TOKEN)
 llm_model = AutoModelForCausalLM.from_pretrained(
     "mistralai/Mistral-7B-Instruct-v0.1", 
