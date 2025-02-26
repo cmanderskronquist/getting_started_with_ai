@@ -7,9 +7,14 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 import time
 
-# Set up env : source venv/bin/activate
+# If venv not set up - use python -m venv venv
+# Set up env (Unix): source venv/bin/activate
+# Set up env (Powershell): .\venv\Scripts activate
+# install the packages:
+# pip install --upgrade pip  # Uppdatera pip först
+# pip install requests beautifulsoup4 sentence-transformers faiss-cpu numpy
 
-# Read Hugging Face token from file
+# Read Hugging Face token from file hf_token
 with open("hf_token", "r") as token_file:
     HF_TOKEN = token_file.read().strip()
 
