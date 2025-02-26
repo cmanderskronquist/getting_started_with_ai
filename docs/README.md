@@ -47,6 +47,9 @@ Another AI that is intended to help with software development, and is more of an
 
 NOTE: *Requires* registration, but not payment - free account is time limited.
 
+## [Corvus Belli Infinity - Sibylla](https://infinityuniverse.ai/)
+AI-assistant trained on a specific game (lore and rules) interesting as an example of a niche assistant.
+
 # Online Virtual Machine AI
 
 ## [Colab](https://colab.research.google.com/)
