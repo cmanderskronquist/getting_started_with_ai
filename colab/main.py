@@ -4,11 +4,11 @@ from helloworld import hello
 from gtts import gTTS
 from IPython.display import Audio
 
-tts = gTTS('The quick brown fox jumps over the lazy dog.', lang='en-uk')
+tts = gTTS('The quick brown fox jumps over the lazy dog.', tld='co.uk')
 tts.save('uk.mp3')
-tts = gTTS('The quick brown fox jumps over the lazy dog.', lang='en-us')
+tts = gTTS('The quick brown fox jumps over the lazy dog.', tld='com')
 tts.save('us.mp3')
-tts = gTTS('The quick brown fox jumps over the lazy dog.', lang='en-au')
+tts = gTTS('The quick brown fox jumps over the lazy dog.', tld='com.au')
 tts.save('au.mp3')
 
 display(Audio('uk.mp3', autoplay=True))
