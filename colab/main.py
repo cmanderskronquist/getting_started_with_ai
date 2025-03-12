@@ -12,7 +12,7 @@ tts = gTTS('The quick brown fox jumps over the lazy dog.', tld='com.au')
 tts.save('au.mp3')
 tts = gTTS('The quick brown fox jumps over the lazy dog.', tld='co.in')
 tts.save('in.mp3')
-tts = gTTS('The quick brown fox jumps over the lazy dog.', tld='.se')
+tts = gTTS('The quick brown fox jumps over the lazy dog.', tld='se')
 tts.save('se.mp3')
 
 display(HTML('<p>UK:</p>'))
