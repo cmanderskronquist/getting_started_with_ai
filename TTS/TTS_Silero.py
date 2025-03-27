@@ -5,8 +5,18 @@ import numpy as np
 from typing import Optional
 
 class SileroTTS:
-    def __init__(self, model_variant: str = 'v3_en', language: str = "en", speaker: str = "en_1", hardware: str = "cpu"):
-        self.device = torch.device(hardware)  # Silero TTS works on CPU
+    def __init__(self, model_variant: str = 'v3_en', language: str = "en", speaker: str = "en_1"):
+        # Select device in order: GPU, Metal, CPU
+        if torch.cuda.is_available():
+            device = torch.device("cuda")
+            print(f"Using GPU: {torch.cuda.get_device_name()}")
+        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            device = torch.device("mps")
+            print("Using Metal Performance Shaders (MPS)")
+        else:
+            device = torch.device("cpu")
+            print("Using CPU")
+        self.device = device
         self.model_variant = model_variant
         self.language = language
         self.speaker = speaker
@@ -14,13 +24,13 @@ class SileroTTS:
         #self.speakers = None
         self.load_model()
 
-
     def load_model(self):
         # Load the Silero TTS model with the correct parameters
         self.model, _ = torch.hub.load('snakers4/silero-models',
-                                                   'silero_tts',
-                                                   language=self.language,
-                                                   speaker=self.model_variant, device=self.device)
+                                        'silero_tts',
+                                        language=self.language,
+                                        speaker=self.model_variant,
+                                        device=self.device)
         
         # Print the available speakers for the loaded model
         # print(f"Available speakers for language '{self.language}': {self.speakers}")
@@ -31,37 +41,32 @@ class SileroTTS:
         #                     f"Available speakers: {self.speakers}")
 
     def audio(self, text: str, model_variant: str = None, speaker: str = None, sample_rate: int = 48000, language: str = None):
-        model_modified=False
+        model_modified = False
         if model_variant is not None and model_variant != self.model_variant:
             self.model_variant = model_variant
-            model_modified=True
+            model_modified = True
         if language is not None and language != self.language:
             self.language = language
-            model_modified=True
+            model_modified = True
         if not self.model or model_modified:
             self.load_model()
         if speaker is None:
             speaker = self.speaker
-        # Generate audio using the loaded model and specified speaker
-        audio = self.model.apply_tts(text=text,
-                                     speaker= speaker,
-                                     sample_rate=sample_rate)
-        
-        # Convert the audio to a NumPy array and play it directly
-        audio = np.asarray(audio, dtype=np.float32)  # Use np.asarray for better compatibility
-        #sample_rate = 48000  # Silero TTS default sample rate
+        audio = self.model.apply_tts(text=text, speaker=speaker, sample_rate=sample_rate)
+        audio = np.asarray(audio, dtype=np.float32)
         return audio
-        
+
     def speak(self, **kwargs):
         audio = self.audio(**kwargs)
         sample_rate = kwargs.get('sample_rate', 48000)
         sd.play(audio, samplerate=sample_rate)
-        sd.wait()  # Wait until the audio playback is finished
+        sd.wait()
 
     def save(self, **kwargs):
         audio = self.audio(**kwargs)
         sample_rate = kwargs.get('sample_rate', 48000)
-        sf.write(filename, audio, sample_rate)
+        # Assume filename is provided properly
+        sf.write(kwargs.get("filename", "output.wav"), audio, sample_rate)
 
 # Example usage:
 #tts = SileroTTS()  # Ensure the speaker matches the language
