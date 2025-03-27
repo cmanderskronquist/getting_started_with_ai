@@ -44,6 +44,6 @@ class SileroTTS:
         sd.wait()  # Wait until the audio playback is finished
 
 # Example usage:
-tts = SileroTTS()  # Ensure the speaker matches the language
-mytext = "The quick brown fox jumps over the lazy dog."
-tts.speak(mytext)
+# tts = SileroTTS()  # Ensure the speaker matches the language
+# mytext = "The quick brown fox jumps over the lazy dog."
+# tts.speak(mytext)
