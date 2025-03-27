@@ -7,3 +7,4 @@ __pycache__
 *.pyo
 output.wav
 output.mp3
+garbage.py
