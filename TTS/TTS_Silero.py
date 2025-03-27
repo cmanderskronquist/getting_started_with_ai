@@ -1,11 +1,12 @@
 import torch
 import sounddevice as sd
+import soundfile as sf
 import numpy as np
 from typing import Optional
 
 class SileroTTS:
-    def __init__(self, model_variant: str = 'v3_en', language: str = "en", speaker: str = "en_1"):
-        self.device = torch.device("cpu")  # Silero TTS works on CPU
+    def __init__(self, model_variant: str = 'v3_en', language: str = "en", speaker: str = "en_1", hardware: str = "cpu"):
+        self.device = torch.device(hardware)  # Silero TTS works on CPU
         self.model_variant = model_variant
         self.language = language
         self.speaker = speaker
@@ -52,13 +53,13 @@ class SileroTTS:
 
     def save(self, filename: str, text: str, speaker: str = None, sample_rate: int = 48000):
         audio = self.audio(text, speaker, sample_rate)
-        sd.save(filename, audio, sample_rate)
+        sf.write(filename, audio, sample_rate)
 
 # Example usage:
 tts = SileroTTS()  # Ensure the speaker matches the language
 mytext = "The quick brown fox jumps over the lazy dog."
-tts.speak(mytext, speaker="en_0" , sample_rate=24000)
-#tts.save("output.wav", mytext, speaker="en_0", sample_rate=24000)
+#tts.speak(mytext, speaker="en_0" , sample_rate=24000)
+tts.save("output.wav", mytext, speaker="en_0", sample_rate=24000)
 
 # TODO: Add a function to list available speakers for a given language
 # TODO (Optional): Add a function to change the language dynamically
