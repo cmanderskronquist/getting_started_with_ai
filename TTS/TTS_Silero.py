@@ -52,19 +52,21 @@ class SileroTTS:
         #sample_rate = 48000  # Silero TTS default sample rate
         return audio
         
-    def speak(self, text: str, model_variant: str = None, speaker: str = None, sample_rate: int = 48000, language: str = None):
-        audio = self.audio(text, speaker=speaker, model_variant=model_variant, sample_rate=sample_rate, language=language)
+    def speak(self, **kwargs):
+        audio = self.audio(**kwargs)
+        sample_rate = kwargs.get('sample_rate', 48000)
         sd.play(audio, samplerate=sample_rate)
         sd.wait()  # Wait until the audio playback is finished
 
-    def save(self, filename: str, text: str, model_variant: str = None, speaker: str = None, sample_rate: int = 48000, language: str = None):
-        audio = self.audio(text, speaker=speaker, model_variant=model_variant, sample_rate=sample_rate, language=language)
+    def save(self, **kwargs):
+        audio = self.audio(**kwargs)
+        sample_rate = kwargs.get('sample_rate', 48000)
         sf.write(filename, audio, sample_rate)
 
 # Example usage:
 #tts = SileroTTS()  # Ensure the speaker matches the language
 #mytext = "The quick brown fox jumps over the lazy dog."
-#tts.speak(mytext)
+#tts.speak(text=mytext)
 #tts.speak(mytext, speaker="en_1" , model_variant='v3_en', sample_rate=48000, language='en')
 #tts.speak(mytext, speaker="hokuspokus" , model_variant='v3_de', sample_rate=48000, language='de')
 #tts.save("output.wav", mytext, speaker="en_0", sample_rate=24000)
