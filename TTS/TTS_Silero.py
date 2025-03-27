@@ -30,10 +30,16 @@ class SileroTTS:
         #    raise ValueError(f"Model Variant '{self.model_variant}' is not valid for language '{self.language}'. "
         #                     f"Available speakers: {self.speakers}")
 
-    def audio(self, text: str, speaker: str = None, sample_rate: int = 48000):
-        if not self.model:
+    def audio(self, text: str, model_variant: str = None, speaker: str = None, sample_rate: int = 48000, language: str = None):
+        model_modified=False
+        if model_variant is not None and model_variant != self.model_variant:
+            self.model_variant = model_variant
+            model_modified=True
+        if language is not None and language != self.language:
+            self.language = language
+            model_modified=True
+        if not self.model or model_modified:
             self.load_model()
-            #raise RuntimeError("Model not loaded. Call `load_model` first.")
         if speaker is None:
             speaker = self.speaker
         # Generate audio using the loaded model and specified speaker
@@ -46,25 +52,24 @@ class SileroTTS:
         #sample_rate = 48000  # Silero TTS default sample rate
         return audio
         
-    def speak(self, text: str, speaker: str = None, sample_rate: int = 48000):
-        audio = self.audio(text, speaker, sample_rate)
+    def speak(self, text: str, model_variant: str = None, speaker: str = None, sample_rate: int = 48000, language: str = None):
+        audio = self.audio(text, speaker=speaker, model_variant=model_variant, sample_rate=sample_rate, language=language)
         sd.play(audio, samplerate=sample_rate)
         sd.wait()  # Wait until the audio playback is finished
 
-    def save(self, filename: str, text: str, speaker: str = None, sample_rate: int = 48000):
-        audio = self.audio(text, speaker, sample_rate)
+    def save(self, filename: str, text: str, model_variant: str = None, speaker: str = None, sample_rate: int = 48000, language: str = None):
+        audio = self.audio(text, speaker=speaker, model_variant=model_variant, sample_rate=sample_rate, language=language)
         sf.write(filename, audio, sample_rate)
 
 # Example usage:
-tts = SileroTTS()  # Ensure the speaker matches the language
-mytext = "The quick brown fox jumps over the lazy dog."
-#tts.speak(mytext, speaker="en_0" , sample_rate=24000)
-tts.save("output.wav", mytext, speaker="en_0", sample_rate=24000)
+#tts = SileroTTS()  # Ensure the speaker matches the language
+#mytext = "The quick brown fox jumps over the lazy dog."
+#tts.speak(mytext)
+#tts.speak(mytext, speaker="en_1" , model_variant='v3_en', sample_rate=48000, language='en')
+#tts.speak(mytext, speaker="hokuspokus" , model_variant='v3_de', sample_rate=48000, language='de')
+#tts.save("output.wav", mytext, speaker="en_0", sample_rate=24000)
 
 # TODO: Add a function to list available speakers for a given language
-# TODO (Optional): Add a function to change the language dynamically
-# TODO (Optional): Add a function to change the model variant dynamically
-# TODO (Optional): Add a function to save the audio to a file
 # TODO (Optional): Add a function to adjust the volume of the audio
 # TODO (Optional): Add a function to adjust the speaking rate
 # TODO (Optional): Add a function to adjust the pitch of the audio
