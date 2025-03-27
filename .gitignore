@@ -5,3 +5,5 @@ hf_token
 __pycache__
 *.pyc
 *.pyo
+output.wav
+output.mp3
