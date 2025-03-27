@@ -4,7 +4,7 @@ import numpy as np
 from typing import Optional
 
 class SileroTTS:
-    def __init__(self, model_variant: str = 'v3_en', language: str = "en", speaker: str = "random"):
+    def __init__(self, model_variant: str = 'v3_en', language: str = "en", speaker: str = "en_01"):
         self.device = torch.device("cpu")  # Silero TTS works on CPU
         self.model_variant = model_variant
         self.language = language
