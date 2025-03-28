@@ -36,14 +36,6 @@ class SileroTTS:
             device=self.device,
         )
 
-        # Print the available speakers for the loaded model
-        # print(f"Available speakers for language '{self.language}': {self.speakers}")
-
-        # Validate the speaker
-        # if self.model_variant not in self.speakers:
-        #    raise ValueError(f"Model Variant '{self.model_variant}' is not valid for language '{self.language}'. "
-        #                     f"Available speakers: {self.speakers}")
-
     def audio(
         self,
         text: str = "The quick brown fox jumps over the lazy dog.",
@@ -75,6 +67,7 @@ class SileroTTS:
         return audio
 
     def prosody(self, text, speed: float = 1.0):
+        # TODO: This doesn't seem actually do anything.
         print("Prosony:", speed)
         if speed < 0.25:
             prosody = "x-slow"
