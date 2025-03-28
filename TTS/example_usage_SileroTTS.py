@@ -5,9 +5,10 @@ tts = SileroTTS()
 tts.speak()
 tts.interrogate()
 
-tts.speak(letmefinish=False)
-tts.speak(letmefinish=True)
-# print(tts.model.speakers)
+#tts.speak(speaker = "random")
+#tts.speak(letmefinish=False)
+#tts.speak(letmefinish=True)
+#print(tts.model.speakers)
 #mytext = "The quick brown fox jumps over the lazy dog."
 #tts.speak(text=mytext)
 # tts.speak(mytext, speaker="en_1" , model_variant='v3_en', sample_rate=48000, language='en')
