@@ -22,6 +22,7 @@ class SileroTTS:
         self.language = language
         self.speaker = speaker
         self.model = None
+        self.speed = 1.0
         # self.speakers = None
         self.load_model()
 
@@ -45,11 +46,12 @@ class SileroTTS:
 
     def audio(
         self,
-        text: str,
+        text: str = "The quick brown fox jumps over the lazy dog.",
         model_variant: str = None,
         speaker: str = None,
         sample_rate: int = 48000,
         language: str = None,
+        speed: float = None,
     ):
         model_modified = False
         if model_variant is not None and model_variant != self.model_variant:
@@ -58,6 +60,10 @@ class SileroTTS:
         if language is not None and language != self.language:
             self.language = language
             model_modified = True
+        if speed is not None and speed != self.speed:
+            print("Speed:", speed)
+            self.speed = speed
+            text = self.prosody(text, speed)  # Fixed: update local text variable instead of self.text
         if not self.model or model_modified:
             self.load_model()
         if speaker is None:
@@ -68,30 +74,58 @@ class SileroTTS:
         audio = np.asarray(audio, dtype=np.float32)
         return audio
 
-    def speak(self, **kwargs):
-        import sounddevice as sd
+    def prosody(self, text, speed: float = 1.0):
+        print("Prosony:", speed)
+        if speed < 0.25:
+            prosody = "x-slow"
+        elif speed < 0.75:
+            prosody = "slow"
+        elif speed < 1.25:
+            prosody = "medium"
+        elif speed < 1.75:
+            prosody = "fast"
+        else:
+            prosody = "x-fast"
+        text = '<speak><prosody rate="' + prosody + '">' + text + '</prosody></speak>'
+        print("Text:", text)
+        return text
 
+    def speak(self, letmefinish: bool = True, **kwargs):
+        import sounddevice as sd
         audio = self.audio(**kwargs)
         sample_rate = kwargs.get("sample_rate", 48000)
         sd.play(audio, samplerate=sample_rate)
-        sd.wait()
+        if letmefinish:
+            sd.wait()
 
     def save(self, **kwargs):
         import soundfile as sf
-
         audio = self.audio(**kwargs)
         sample_rate = kwargs.get("sample_rate", 48000)
         # Assume filename is provided properly
         sf.write(kwargs.get("filename", "output.wav"), audio, sample_rate)
 
-# Example usage:
-tts = SileroTTS()
-# Get deep size (includes nested objects)
-mytext = "The quick brown fox jumps over the lazy dog."
-tts.speak(text=mytext)
-# tts.speak(mytext, speaker="en_1" , model_variant='v3_en', sample_rate=48000, language='en')
-# tts.speak(mytext, speaker="hokuspokus" , model_variant='v3_de', sample_rate=48000, language='de')
-# tts.save("output.wav", mytext, speaker="en_0", sample_rate=24000)
+    def interrogate(self):
+        def format_size(num_bytes):
+            for unit in ["B", "KB", "MB", "GB", "TB"]:
+                if num_bytes < 1024.0:
+                    return f"{num_bytes:.2f} {unit}"
+                num_bytes /= 1024.0
+        # TODO (Optional): Expand interrogations
+        device = self.device
+        if device == torch.device("cuda"):
+            #TODO (Optional): Test on a cuda device and show memory summary
+            #https://pytorch.org/docs/stable/cuda.html
+            #torch.cuda.memory_summary(device=device, abbreviated=True)
+            pass
+        elif device == torch.device("cpu"):
+            print("Using CPU, memory footprint not available.")
+        elif device == torch.device("mps"):
+            print("MPS Interrogation:")
+            print("Max memory: " + format_size(torch.mps.recommended_max_memory()))
+            print("Allocated memory: " + format_size(torch.mps.driver_allocated_memory()))
+        else:
+            print("Unknown device: ", device)
 
 # TODO: Add a function to list available speakers for a given language
 # TODO (Optional): Add a function to adjust the volume of the audio
@@ -104,4 +138,3 @@ tts.speak(text=mytext)
 # TODO (Optional): Add a function to adjust the audio encoding (e.g., PCM, MP3, Vorbis)
 # TODO (Optional): Add a function to adjust the audio effects (e.g., reverb, echo, noise reduction)
 # TODO (Optional): Add a function to adjust the audio synthesis method (e.g., Tacotron2, FastSpeech)
-# TODO (Optional): Show momery footprint of model
