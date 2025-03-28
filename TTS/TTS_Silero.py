@@ -123,6 +123,7 @@ class SileroTTS:
         elif device == torch.device("mps"):
             print("MPS Interrogation:")
             print("Max memory: " + format_size(torch.mps.recommended_max_memory()))
+            #TODO (Optional): This seems to grossly under-report the memory usage
             print("Allocated memory: " + format_size(torch.mps.driver_allocated_memory()))
         else:
             print("Unknown device: ", device)
