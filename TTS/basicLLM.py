@@ -5,10 +5,13 @@ from TTS_Silero import SileroTTS
 # Load the model and tokenizer
 model_name = "microsoft/phi-1_5"  # You can also use "microsoft/phi-1_5" or a smaller variant
 tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name)
+model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype=torch.float16, 
+    device_map="auto", )
 tts = SileroTTS()  # Ensure the speaker matches the language
 
 device = "mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu"
+
+print("LLM uses device: "+device)
 
 # Simple chatbot loop
 def chat():
