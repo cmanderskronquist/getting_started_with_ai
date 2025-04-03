@@ -8,6 +8,8 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
 tts = SileroTTS()  # Ensure the speaker matches the language
 
+device = "mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu"
+
 # Simple chatbot loop
 def chat():
     print("Chatbot is ready! Type 'exit' to quit.")
@@ -22,7 +24,7 @@ def chat():
         history += f"User: {user_input}\nAssistant:"
 
         # Tokenize and generate
-        inputs = tokenizer(history, return_tensors="pt")
+        inputs = tokenizer(history, return_tensors="pt").to(device)
         outputs = model.generate(**inputs, max_new_tokens=100, pad_token_id=tokenizer.eos_token_id)
 
         # Decode response
@@ -31,7 +33,7 @@ def chat():
         # Extract only the assistant's reply
         reply = response[len(history):].strip().split("\n")[0]
         print("Bot:", reply)
-        tts.speak(reply)
+        tts.speak(text=reply)
 
 
         # Add reply to history

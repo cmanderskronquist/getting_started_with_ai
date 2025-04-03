@@ -76,6 +76,7 @@ llm_model = AutoModelForCausalLM.from_pretrained(
 # Optimize for Apple Silicon (Metal GPU acceleration)
 device = "mps" if torch.backends.mps.is_available() else "cuda" if torch.cuda.is_available() else "cpu"
 
+
 def generate_answer_with_llm(question: str):
     context = retrieve_relevant_text(question)
     prompt = f"""
