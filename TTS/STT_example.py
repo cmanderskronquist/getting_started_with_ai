@@ -2,7 +2,7 @@ import sounddevice as sd
 import numpy as np
 from scipy.io.wavfile import write
 import tempfile
-from STT_Silero import SileroSTT  # make sure your class is saved as silero_stt.py or update import
+from STT_Simplero import SileroSTT  # make sure your class is saved as silero_stt.py or update import
 
 # Set audio params
 DURATION = 5  # seconds to record
@@ -21,7 +21,6 @@ def record_audio(duration: int = DURATION, sample_rate: int = SAMPLE_RATE) -> st
 
 def main():
     stt = SileroSTT()  # CPU-only version
-
     wav_path = '/var/folders/zd/fyg3hrz54rd28b5nvkq_xg240000gn/T/tmp6ilbayqn.wav'
     text = stt.transcribe(wav_path)
     
