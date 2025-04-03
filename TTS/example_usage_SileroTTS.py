@@ -1,9 +1,14 @@
 from TTS_Silero import SileroTTS
+from STT_Silero import SileroSTT
 
 # Example usage:
 tts = SileroTTS()
 tts.speak()
 tts.interrogate()
+tts.save(filename="output.wav" , text="The quick brown hyena jumps over the big ugly dog.")
+stt = SileroSTT()
+stt.transcribe("output.wav")
+
 
 #tts.speak(speaker = "random")
 #tts.speak(letmefinish=False)

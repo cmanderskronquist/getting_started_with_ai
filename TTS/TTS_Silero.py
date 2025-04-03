@@ -36,6 +36,9 @@ class SileroTTS:
             device=self.device,
         )
 
+    def speakers(self, **kwargs):
+        return self.model.speakers
+    
     def audio(
         self,
         text: str = "The quick brown fox jumps over the lazy dog.",
@@ -93,10 +96,11 @@ class SileroTTS:
 
     def save(self, **kwargs):
         import soundfile as sf
+        filename = kwargs.pop("filename", "output.wav")
         audio = self.audio(**kwargs)
         sample_rate = kwargs.get("sample_rate", 48000)
         # Assume filename is provided properly
-        sf.write(kwargs.get("filename", "output.wav"), audio, sample_rate)
+        sf.write(filename, audio, sample_rate)
 
     def interrogate(self):
         def format_size(num_bytes):
@@ -121,7 +125,6 @@ class SileroTTS:
         else:
             print("Unknown device: ", device)
 
-# TODO: Add a function to list available speakers for a given language
 # TODO (Optional): Add a function to adjust the volume of the audio
 # TODO (Optional): Add a function to adjust the speaking rate
 # TODO (Optional): Add a function to adjust the pitch of the audio
