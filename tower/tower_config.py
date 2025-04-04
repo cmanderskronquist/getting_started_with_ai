@@ -17,6 +17,9 @@ GROUND_COLOR = (100, 80, 50)
 BUTTON_COLOR = (200, 240, 200)
 TEXT_COLOR = (0, 0, 0)
 
+# World
+WORLD_HORIZON_Y = 0
+
 # Room dimensions
 ROOM_WIDTH = 120
 ROOM_HEIGHT = 40
