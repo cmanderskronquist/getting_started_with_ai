@@ -24,10 +24,10 @@ font = pygame.font.SysFont(None, 24)
 tower_rooms = []
 basement_rooms = []
 
-# Resources
-resources = {
-    "Earth": 0
-}
+resources = {"Earth": 0}
+
+camera_offset_y = 0
+zoom_level = 1.0
 
 class Room:
     def __init__(self, y):
@@ -37,24 +37,28 @@ class Room:
         self.y = y
 
     def draw(self, surface):
-        pygame.draw.rect(surface, ROOM_COLOR, (self.x, self.y, self.width, self.height))
+        scaled_x = int(self.x * zoom_level)
+        scaled_y = int((self.y + camera_offset_y) * zoom_level)
+        scaled_w = int(self.width * zoom_level)
+        scaled_h = int(self.height * zoom_level)
+
+        pygame.draw.rect(surface, ROOM_COLOR, (scaled_x, scaled_y, scaled_w, scaled_h))
         label = font.render("Room", True, TEXT_COLOR)
-        surface.blit(label, (self.x + 30, self.y + 10))
+        surface.blit(label, (scaled_x + 10, scaled_y + 10))
 
 class Button:
     def __init__(self, x, y, w, h, text):
-        self.rect = pygame.Rect(x, y, w, h)
+        self.base_rect = pygame.Rect(x, y, w, h)
         self.text = text
 
     def draw(self, surface):
-        pygame.draw.rect(surface, BUTTON_COLOR, self.rect)
+        pygame.draw.rect(surface, BUTTON_COLOR, self.base_rect)
         label = font.render(self.text, True, TEXT_COLOR)
-        surface.blit(label, (self.rect.x + 10, self.rect.y + 10))
+        surface.blit(label, (self.base_rect.x + 10, self.base_rect.y + 10))
 
     def is_clicked(self, pos):
-        return self.rect.collidepoint(pos)
+        return self.base_rect.collidepoint(pos)
 
-# Buttons
 build_button = Button(WIDTH - 150, 100, 120, 40, "Build Room")
 dig_button = Button(WIDTH - 150, 160, 120, 40, "Dig Basement")
 
@@ -66,8 +70,20 @@ def draw_resources(surface):
         surface.blit(label, (x, y))
         y += 30
 
+def draw_base(surface):
+    x = WIDTH // 2 - 100
+    y = HEIGHT - 50 + camera_offset_y
+    w, h = 200, 50
+
+    pygame.draw.rect(surface, TOWER_BASE_COLOR, (
+        int(x * zoom_level), int(y * zoom_level),
+        int(w * zoom_level), int(h * zoom_level)
+    ))
+
 def main():
+    global camera_offset_y, zoom_level
     running = True
+
     while running:
         clock.tick(FPS)
 
@@ -77,40 +93,38 @@ def main():
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if build_button.is_clicked(event.pos):
-                    # Stack a new tower room
-                    if tower_rooms:
-                        top_y = tower_rooms[-1].y - 45
-                    else:
-                        top_y = HEIGHT - 100
+                    top_y = tower_rooms[-1].y - 45 if tower_rooms else HEIGHT - 100
                     tower_rooms.append(Room(top_y))
 
                 elif dig_button.is_clicked(event.pos):
-                    # Dig out a basement room
-                    if basement_rooms:
-                        next_y = basement_rooms[-1].y + 45
-                    else:
-                        next_y = HEIGHT - 50 + 45
+                    next_y = basement_rooms[-1].y + 45 if basement_rooms else HEIGHT - 50 + 45
                     basement_rooms.append(Room(next_y))
-                    resources["Earth"] += 10  # Gain Earth when digging
+                    resources["Earth"] += 10
+
+            elif event.type == pygame.KEYDOWN:
+                # Scroll
+                if event.key == pygame.K_w or event.key == pygame.K_UP:
+                    camera_offset_y += 20
+                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                    camera_offset_y -= 20
+                # Zoom
+                elif event.key == pygame.K_EQUALS or event.key == pygame.K_PLUS:
+                    zoom_level = min(2.0, zoom_level + 0.1)
+                elif event.key == pygame.K_MINUS:
+                    zoom_level = max(0.5, zoom_level - 0.1)
 
         screen.fill(BG_COLOR)
 
-        # Tower base
-        pygame.draw.rect(screen, TOWER_BASE_COLOR, (WIDTH//2 - 100, HEIGHT - 50, 200, 50))
-
-        # Draw tower rooms
+        # Draw rooms
         for room in tower_rooms:
             room.draw(screen)
-
-        # Draw basement rooms
+        draw_base(screen)
         for room in basement_rooms:
             room.draw(screen)
 
-        # Draw buttons
+        # Draw UI
         build_button.draw(screen)
         dig_button.draw(screen)
-
-        # Draw resource panel
         draw_resources(screen)
 
         pygame.display.flip()
