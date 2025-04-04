@@ -10,4 +10,4 @@ output.mp3
 garbage.py
 .history
 venv/**
-
+.DS_Store
