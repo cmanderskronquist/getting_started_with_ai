@@ -20,19 +20,24 @@ TEXT_COLOR = (0, 0, 0)
 # Fonts
 font = pygame.font.SysFont(None, 24)
 
-# Tower and basement data
+# Game Data
 tower_rooms = []
 basement_rooms = []
-
 resources = {"Earth": 0}
 
+# Camera
 camera_offset_y = 0
 zoom_level = 1.0
 
+# Room size
+ROOM_WIDTH = 120
+ROOM_HEIGHT = 40
+ROOM_SPACING = 5
+
 class Room:
     def __init__(self, y):
-        self.width = 120
-        self.height = 40
+        self.width = ROOM_WIDTH
+        self.height = ROOM_HEIGHT
         self.x = WIDTH // 2 - self.width // 2
         self.y = y
 
@@ -47,26 +52,32 @@ class Room:
         surface.blit(label, (scaled_x + 10, scaled_y + 10))
 
 class Button:
-    def __init__(self, x, y, w, h, text):
-        self.base_rect = pygame.Rect(x, y, w, h)
+    def __init__(self, x, y, w, h, text, action=None):
+        self.rect = pygame.Rect(x, y, w, h)
         self.text = text
+        self.action = action
 
     def draw(self, surface):
-        pygame.draw.rect(surface, BUTTON_COLOR, self.base_rect)
+        pygame.draw.rect(surface, BUTTON_COLOR, self.rect)
         label = font.render(self.text, True, TEXT_COLOR)
-        surface.blit(label, (self.base_rect.x + 10, self.base_rect.y + 10))
+        surface.blit(label, (self.rect.x + 5, self.rect.y + 10))
 
     def is_clicked(self, pos):
-        return self.base_rect.collidepoint(pos)
+        return self.rect.collidepoint(pos)
 
+# Game Buttons
 build_button = Button(WIDTH - 150, 100, 120, 40, "Build Room")
 dig_button = Button(WIDTH - 150, 160, 120, 40, "Dig Basement")
+
+zoom_in_button = Button(WIDTH - 150, 220, 30, 30, "+")
+zoom_out_button = Button(WIDTH - 110, 220, 30, 30, "-")
+zoom_max_button = Button(WIDTH - 150, 260, 70, 30, "Max")
+zoom_min_button = Button(WIDTH - 75, 260, 70, 30, "Min")
 
 def draw_resources(surface):
     x, y = 20, 20
     for resource, amount in resources.items():
-        text = f"{resource}: {amount}"
-        label = font.render(text, True, TEXT_COLOR)
+        label = font.render(f"{resource}: {amount}", True, TEXT_COLOR)
         surface.blit(label, (x, y))
         y += 30
 
@@ -79,6 +90,20 @@ def draw_base(surface):
         int(x * zoom_level), int(y * zoom_level),
         int(w * zoom_level), int(h * zoom_level)
     ))
+
+def calculate_min_zoom():
+    total_rooms = len(tower_rooms) + len(basement_rooms)
+    if total_rooms == 0:
+        return 1.0  # Default zoom
+    full_height = (total_rooms * (ROOM_HEIGHT + ROOM_SPACING)) + 100
+    return min(1.0, HEIGHT / full_height)
+
+def handle_mouse_scroll(event):
+    global camera_offset_y
+    if event.y > 0:
+        camera_offset_y += 30 / zoom_level
+    else:
+        camera_offset_y -= 30 / zoom_level
 
 def main():
     global camera_offset_y, zoom_level
@@ -101,21 +126,24 @@ def main():
                     basement_rooms.append(Room(next_y))
                     resources["Earth"] += 10
 
-            elif event.type == pygame.KEYDOWN:
-                # Scroll
-                if event.key == pygame.K_w or event.key == pygame.K_UP:
-                    camera_offset_y += 20
-                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
-                    camera_offset_y -= 20
-                # Zoom
-                elif event.key == pygame.K_EQUALS or event.key == pygame.K_PLUS:
+                elif zoom_in_button.is_clicked(event.pos):
                     zoom_level = min(2.0, zoom_level + 0.1)
-                elif event.key == pygame.K_MINUS:
+
+                elif zoom_out_button.is_clicked(event.pos):
                     zoom_level = max(0.5, zoom_level - 0.1)
+
+                elif zoom_max_button.is_clicked(event.pos):
+                    zoom_level = 1.0
+
+                elif zoom_min_button.is_clicked(event.pos):
+                    zoom_level = calculate_min_zoom()
+
+            elif event.type == pygame.MOUSEWHEEL:
+                handle_mouse_scroll(event)
 
         screen.fill(BG_COLOR)
 
-        # Draw rooms
+        # Draw game world
         for room in tower_rooms:
             room.draw(screen)
         draw_base(screen)
@@ -126,6 +154,11 @@ def main():
         build_button.draw(screen)
         dig_button.draw(screen)
         draw_resources(screen)
+
+        zoom_in_button.draw(screen)
+        zoom_out_button.draw(screen)
+        zoom_max_button.draw(screen)
+        zoom_min_button.draw(screen)
 
         pygame.display.flip()
 
