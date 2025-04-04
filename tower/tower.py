@@ -38,18 +38,18 @@ class Room:
     def __init__(self, y):
         self.width = ROOM_WIDTH
         self.height = ROOM_HEIGHT
-        self.x = WIDTH // 2 - self.width // 2
-        self.y = y
+        self.y = y  # vertical position only
 
     def draw(self, surface):
-        scaled_x = int(self.x * zoom_level)
-        scaled_y = int((self.y + camera_offset_y) * zoom_level)
-        scaled_w = int(self.width * zoom_level)
-        scaled_h = int(self.height * zoom_level)
+        # Recalculate horizontal centering at draw time, using zoom
+        scaled_width = int(self.width * zoom_level)
+        scaled_height = int(self.height * zoom_level)
+        x = (WIDTH // 2) - (scaled_width // 2)
+        y = int((self.y + camera_offset_y) * zoom_level)
 
-        pygame.draw.rect(surface, ROOM_COLOR, (scaled_x, scaled_y, scaled_w, scaled_h))
+        pygame.draw.rect(surface, ROOM_COLOR, (x, y, scaled_width, scaled_height))
         label = font.render("Room", True, TEXT_COLOR)
-        surface.blit(label, (scaled_x + 10, scaled_y + 10))
+        surface.blit(label, (x + 10, y + 10))
 
 class Button:
     def __init__(self, x, y, w, h, text, action=None):
@@ -68,7 +68,6 @@ class Button:
 # Game Buttons
 build_button = Button(WIDTH - 150, 100, 120, 40, "Build Room")
 dig_button = Button(WIDTH - 150, 160, 120, 40, "Dig Basement")
-
 zoom_in_button = Button(WIDTH - 150, 220, 30, 30, "+")
 zoom_out_button = Button(WIDTH - 110, 220, 30, 30, "-")
 zoom_max_button = Button(WIDTH - 150, 260, 70, 30, "Max")
@@ -82,28 +81,33 @@ def draw_resources(surface):
         y += 30
 
 def draw_base(surface):
-    x = WIDTH // 2 - 100
-    y = HEIGHT - 50 + camera_offset_y
-    w, h = 200, 50
+    scaled_w = int(200 * zoom_level)
+    scaled_h = int(50 * zoom_level)
+    x = (WIDTH // 2) - (scaled_w // 2)
+    y = int((HEIGHT - 50 + camera_offset_y) * zoom_level)
+    pygame.draw.rect(surface, TOWER_BASE_COLOR, (x, y, scaled_w, scaled_h))
 
-    pygame.draw.rect(surface, TOWER_BASE_COLOR, (
-        int(x * zoom_level), int(y * zoom_level),
-        int(w * zoom_level), int(h * zoom_level)
-    ))
+def calculate_min_zoom_and_scroll():
+    global zoom_level, camera_offset_y
 
-def calculate_min_zoom():
-    total_rooms = len(tower_rooms) + len(basement_rooms)
-    if total_rooms == 0:
-        return 1.0  # Default zoom
-    full_height = (total_rooms * (ROOM_HEIGHT + ROOM_SPACING)) + 100
-    return min(1.0, HEIGHT / full_height)
+    # Calculate full height of the visible tower/dungeon
+    top_y = tower_rooms[-1].y if tower_rooms else (HEIGHT - 100)
+    bottom_y = basement_rooms[-1].y + ROOM_HEIGHT if basement_rooms else (HEIGHT - 50)
+
+    total_height = bottom_y - top_y
+    padding = 100  # extra margin
+
+    # Calculate zoom to fit everything into screen height
+    zoom_level = min(1.0, (HEIGHT - padding) / total_height)
+
+    # Center the view vertically
+    content_mid_y = (top_y + bottom_y) / 2
+    screen_mid_y = HEIGHT / (2 * zoom_level)
+    camera_offset_y = screen_mid_y - content_mid_y
 
 def handle_mouse_scroll(event):
     global camera_offset_y
-    if event.y > 0:
-        camera_offset_y += 30 / zoom_level
-    else:
-        camera_offset_y -= 30 / zoom_level
+    camera_offset_y += (30 / zoom_level) * (-event.y)
 
 def main():
     global camera_offset_y, zoom_level
@@ -133,10 +137,10 @@ def main():
                     zoom_level = max(0.5, zoom_level - 0.1)
 
                 elif zoom_max_button.is_clicked(event.pos):
-                    zoom_level = 1.0
+                    zoom_level = 1.0  # reset zoom, keep camera position
 
                 elif zoom_min_button.is_clicked(event.pos):
-                    zoom_level = calculate_min_zoom()
+                    calculate_min_zoom_and_scroll()  # reset both zoom and scroll
 
             elif event.type == pygame.MOUSEWHEEL:
                 handle_mouse_scroll(event)
@@ -153,12 +157,11 @@ def main():
         # Draw UI
         build_button.draw(screen)
         dig_button.draw(screen)
-        draw_resources(screen)
-
         zoom_in_button.draw(screen)
         zoom_out_button.draw(screen)
         zoom_max_button.draw(screen)
         zoom_min_button.draw(screen)
+        draw_resources(screen)
 
         pygame.display.flip()
 
