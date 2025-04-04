@@ -1,13 +1,4 @@
-# tower_cam.py
-
-# Constants for screen and room layout
-WIDTH = 800
-HEIGHT = 600
-UI_LEFT_MARGIN = 150
-UI_RIGHT_MARGIN = 150
-ROOM_WIDTH = 120
-ROOM_HEIGHT = 40
-ROOM_SPACING = 5
+from tower_config import WIDTH, HEIGHT, UI_LEFT_MARGIN, UI_RIGHT_MARGIN, ROOM_WIDTH, ROOM_HEIGHT, ROOM_SPACING
 
 # Camera state
 camera_offset_y = 0
@@ -24,9 +15,9 @@ def set_camera(offset, zoom):
 def calculate_min_zoom_only(tower_rooms, basement_rooms):
     if not tower_rooms and not basement_rooms:
         return 1.0
-    top = tower_rooms[-1].grid_y if tower_rooms else 0
-    bottom = basement_rooms[-1].grid_y if basement_rooms else 0
-    total_height = (bottom - top + 1) * (ROOM_HEIGHT + ROOM_SPACING)
+    top = tower_rooms[-1].rect.y if tower_rooms else 0
+    bottom = basement_rooms[-1].rect.y if basement_rooms else 0
+    total_height = (bottom - top + ROOM_HEIGHT + ROOM_SPACING)
     return min(1.0, (HEIGHT - 100) / total_height)
 
 def calculate_min_zoom_and_scroll(tower_rooms, basement_rooms):
@@ -36,13 +27,12 @@ def calculate_min_zoom_and_scroll(tower_rooms, basement_rooms):
         camera_offset_y = 0
         return
 
-    top = tower_rooms[-1].grid_y if tower_rooms else 0
-    bottom = basement_rooms[-1].grid_y if basement_rooms else 0
-    total_height = (bottom - top + 1) * (ROOM_HEIGHT + ROOM_SPACING)
+    top = tower_rooms[-1].rect.y if tower_rooms else 0
+    bottom = basement_rooms[-1].rect.y if basement_rooms else 0
+    total_height = (bottom - top + ROOM_HEIGHT + ROOM_SPACING)
     zoom_level = min(1.0, (HEIGHT - 100) / total_height)
 
-    mid_grid_y = (top + bottom) / 2
-    mid_world_y = mid_grid_y * (ROOM_HEIGHT + ROOM_SPACING)
+    mid_world_y = (top + bottom) / 2
     screen_mid_y = HEIGHT / (2 * zoom_level)
     camera_offset_y = screen_mid_y - mid_world_y
 

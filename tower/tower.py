@@ -1,6 +1,10 @@
 import pygame
 import sys
-from tower_ui import Button, draw_resources, init_font
+from tower_config import (
+    WIDTH, HEIGHT, FPS, SKY_COLOR, EARTH_COLOR, ROOM_COLOR, GROUND_COLOR,
+    BUTTON_COLOR, TEXT_COLOR, ROOM_WIDTH, ROOM_HEIGHT, ROOM_SPACING, FONT
+)
+from tower_ui import Button, draw_resources
 from tower_cam import (
     apply_zoom,
     calculate_max_zoom,
@@ -8,51 +12,49 @@ from tower_cam import (
     handle_mouse_scroll,
     get_camera
 )
+from tower_config import (  # Import constants from config.py
+    WIDTH, HEIGHT, FPS, SKY_COLOR, EARTH_COLOR, ROOM_COLOR, GROUND_COLOR,
+    BUTTON_COLOR, TEXT_COLOR, ROOM_WIDTH, ROOM_HEIGHT, ROOM_SPACING
+)
 
-pygame.init()
-init_font()  # Ensure font is initialized after pygame.init()
 
-# Screen
-WIDTH, HEIGHT = 800, 600
-FPS = 60
+
+# Screen setup
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Wizard Tower Builder")
 clock = pygame.time.Clock()
-
-# Colors
-SKY_COLOR = (180, 220, 255)
-EARTH_COLOR = (170, 140, 110)
-ROOM_COLOR = (230, 190, 255)
-GROUND_COLOR = (100, 80, 50)
 
 # Game Data
 tower_rooms = []
 basement_rooms = []
 resources = {"Earth": 0}
 
+# Constants for screen and room layout
+WIDTH = 800
+HEIGHT = 600
+UI_LEFT_MARGIN = 150
+UI_RIGHT_MARGIN = 150
+# Colors
+BUTTON_COLOR = (200, 240, 200)
+TEXT_COLOR = (0, 0, 0)
 # Room size
 ROOM_WIDTH = 120
 ROOM_HEIGHT = 40
-ROOM_SPACING = 5
+ROOM_SPACING = 1
 
 class Room:
-    def __init__(self, grid_y):
-        self.grid_y = grid_y
-        self.width = ROOM_WIDTH
-        self.height = ROOM_HEIGHT
+    def __init__(self, x, y, width, height, color, label=""):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.color = color
+        self.label = label
 
     def draw(self, surface):
-        camera_offset_y, zoom_level = get_camera()
-        scaled_width = int(self.width * zoom_level)
-        scaled_height = int(self.height * zoom_level)
-        x = (WIDTH // 2) - (scaled_width // 2)
-        world_y = self.grid_y * (self.height + ROOM_SPACING)
-        screen_y = int((world_y + camera_offset_y) * zoom_level)
+        pygame.draw.rect(surface, self.color, self.rect)
 
-        font = pygame.font.SysFont(None, 24)
-        pygame.draw.rect(surface, ROOM_COLOR, (x, screen_y, scaled_width, scaled_height))
-        label = font.render(f"Room ({self.grid_y})", True, (0, 0, 0))
-        surface.blit(label, (x + 10, screen_y + 10))
+        if FONT and self.label:
+            text = FONT.render(self.label, True, (0, 0, 0))
+            text_rect = text.get_rect(center=self.rect.center)
+            surface.blit(text, text_rect)
 
 # Buttons
 build_button = Button(WIDTH - 150, 100, 120, 40, "Build Room")
@@ -92,13 +94,18 @@ def main():
                 running = False
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
+                camera_offset_y, zoom_level = get_camera()
+                horizon_y = int(camera_offset_y * zoom_level)
+
                 if build_button.is_clicked(event.pos):
-                    new_grid_y = tower_rooms[-1].grid_y - 1 if tower_rooms else -1
-                    tower_rooms.append(Room(new_grid_y))
+                    # Position new room above the horizon
+                    new_grid_y = tower_rooms[-1].rect.y - (ROOM_HEIGHT + ROOM_SPACING) if tower_rooms else horizon_y - ROOM_HEIGHT - ROOM_SPACING
+                    tower_rooms.append(Room(WIDTH // 2 - ROOM_WIDTH // 2, new_grid_y, ROOM_WIDTH, ROOM_HEIGHT, (200, 200, 200), "Room"))
 
                 elif dig_button.is_clicked(event.pos):
-                    new_grid_y = basement_rooms[-1].grid_y + 1 if basement_rooms else 1
-                    basement_rooms.append(Room(new_grid_y))
+                    # Position new basement below the horizon
+                    new_grid_y = basement_rooms[-1].rect.y + (ROOM_HEIGHT + ROOM_SPACING) if basement_rooms else horizon_y + ROOM_SPACING
+                    basement_rooms.append(Room(WIDTH // 2 - ROOM_WIDTH // 2, new_grid_y, ROOM_WIDTH, ROOM_HEIGHT, (100, 100, 100), "Basement"))
                     resources["Earth"] += 10
 
                 elif zoom_in_button.is_clicked(event.pos):
