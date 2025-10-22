@@ -5,7 +5,12 @@ from typing import Optional
 
 class SileroTTS:
     def __init__(
-        self, model_variant: str = "v3_en", language: str = "en", speaker: str = "en_1"
+        self, 
+        model_variant: str = "v3_en", 
+        language: str = "en", 
+        speaker: str = "en_1",
+        model_repo: str = "snakers4/silero-models",
+        model_name: str = "silero_tts"
     ):
         # Select device in order: GPU, Metal, CPU
         if torch.cuda.is_available():
@@ -23,18 +28,45 @@ class SileroTTS:
         self.speaker = speaker
         self.model = None
         self.speed = 1.0
-        # self.speakers = None
-        self.load_model()
+        self._utils = None
+        # Load the model with the specified parameters
+        self.load_model(model_repo=model_repo, model_name=model_name)
 
-    def load_model(self):
-        # Load the Silero TTS model with the correct parameters
-        self.model, _ = torch.hub.load(
-            "snakers4/silero-models",
-            "silero_tts",
-            language=self.language,
-            speaker=self.model_variant,
-            device=self.device,
-        )
+    def load_model(self, model_repo: str = "snakers4/silero-models", model_name: str = "silero_tts"):
+        """
+        Load a TTS model with flexible parameters.
+        
+        Args:
+            model_repo (str): Repository name containing the model
+            model_name (str): Name of the model to load
+        """
+        try:
+            # Load the Silero TTS model with the correct parameters
+            self.model, utils = torch.hub.load(
+                repo_or_dir=model_repo,
+                model=model_name,
+                language=self.language,
+                speaker=self.model_variant,
+                device=self.device,
+                trust_repo=True  # Add trust_repo flag for external repositories
+            )
+            
+            # Store available speakers and utils for later use
+            self._utils = utils
+            print(f"Successfully loaded model from {model_repo}/{model_name}")
+            print(f"Available speakers: {self.model.speakers}")
+            
+        except Exception as e:
+            print(f"Error loading model: {str(e)}")
+            print("Falling back to default model...")
+            # Fallback to default model
+            self.model, utils = torch.hub.load(
+                "snakers4/silero-models",
+                "silero_tts",
+                language=self.language,
+                speaker=self.model_variant,
+                device=self.device,
+            )
 
     def speakers(self, **kwargs):
         return self.model.speakers
@@ -124,6 +156,11 @@ class SileroTTS:
             print("Allocated memory: " + format_size(torch.mps.driver_allocated_memory()))
         else:
             print("Unknown device: ", device)
+
+tts=SileroTTS()
+# Load a different model
+tts.load_model(model_repo="different_repo/models", model_name="custom_tts")
+print(tts.speakers())
 
 # TODO (Optional): Add a function to adjust the volume of the audio
 # TODO (Optional): Add a function to adjust the speaking rate

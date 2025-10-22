@@ -19,34 +19,54 @@ TTS_SAMPLE_RATE = 48000
 
 def record_until_space(sample_rate=STT_SAMPLE_RATE, channels=1, dtype='int16'):
     """
-    Record audio until the SPACE key is pressed.
-    Audio is captured via a callback and stored in a queue.
-    Returns the recorded audio as a NumPy array.
+    Record audio until the SPACE key is pressed using a simpler approach.
     """
-    q = queue.Queue()
-    recorded_chunks = []
-
-    def callback(indata, frames, time_info, status):
-        q.put(indata.copy())
-
     print("Recording... Press SPACE to stop.")
-    stream = sd.InputStream(samplerate=sample_rate, channels=channels, dtype=dtype, callback=callback)
-    with stream:
-        while True:
-            # Check if SPACE is pressed; if so, break out of loop.
-            if keyboard.is_pressed("space"):
-                print("Space pressed. Stopping recording.")
-                break
-            time.sleep(0.1)
-        # Drain remaining chunks from the queue
-        while not q.empty():
-            recorded_chunks.append(q.get())
-
-    if recorded_chunks:
-        audio = np.concatenate(recorded_chunks, axis=0)
-    else:
-        audio = np.array([], dtype=dtype)
-    return audio
+    
+    # Pre-allocate a buffer (30 seconds max)
+    buffer_size = int(30 * sample_rate)  # 30 seconds buffer
+    audio_buffer = np.zeros((buffer_size,), dtype=dtype)
+    
+    try:
+        # Start recording
+        with sd.InputStream(
+            samplerate=sample_rate,
+            channels=channels,
+            dtype=dtype,
+            blocksize=1024  # Smaller blocksize
+        ) as stream:
+            
+            # Read data directly without callback
+            frame_count = 0
+            while True:
+                if keyboard.is_pressed("space"):
+                    print("Space pressed. Stopping recording.")
+                    break
+                    
+                # Read a small chunk of data
+                data, overflowed = stream.read(1024)
+                if overflowed:
+                    print("Warning: Audio buffer overflowed")
+                    
+                # Calculate remaining space in buffer
+                remaining = buffer_size - frame_count
+                if remaining <= 0:
+                    print("Maximum recording length reached")
+                    break
+                    
+                # Copy data to buffer
+                chunk_size = min(len(data), remaining)
+                audio_buffer[frame_count:frame_count + chunk_size] = data.flatten()[:chunk_size]
+                frame_count += chunk_size
+                
+                time.sleep(0.001)  # Small sleep to prevent high CPU usage
+        
+        # Trim the buffer to actual recorded length
+        return audio_buffer[:frame_count]
+        
+    except Exception as e:
+        print(f"Error during recording: {e}")
+        return np.array([], dtype=dtype)
 
 def main():
     # Initialize STT and TTS engines
