@@ -15,4 +15,4 @@ def playMyAudio(file):
     sd.wait()  # Wait until the file is done playing    
 
 
-playMyAudio("/Users/sv/skill-AI/getting_started_with_ai/TTS/audio.wav")
+#playMyAudio("/Users/sv/skill-AI/getting_started_with_ai/TTS/audio.wav")
