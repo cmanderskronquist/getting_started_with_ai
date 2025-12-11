@@ -48,4 +48,4 @@ torchvision==0.20.1
 tqdm==4.67.1
 transformers==4.48.1
 typing_extensions==4.12.2
-urllib3==2.3.0
+urllib3==2.6.0
